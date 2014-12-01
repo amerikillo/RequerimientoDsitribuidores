@@ -38,36 +38,8 @@
         <div class="container">
             <h1>SIALSS</h1>
             <h4>Módulo - Requerimiento de Distribuidor</h4>
-            <div class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                            <span clss="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="main_menu.jsp">Inicio</a>
-                    </div>
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Requerimientos<b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="main_menu.jsp"  onclick="">Captura de Requerimientos</a></li>
-                                    <li><a href="verRequerimientos.jsp"  onclick="">Ver Requerimientos</a></li>
-                                    <!--li><a href="#"  onclick="window.open('verDevolucionesEntrada.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Imprimir Devoluciones</a></li>
-                                    <li><a href="#"  onclick="window.open('devolucionesInsumo.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Devolver</a></li-->
-                                </ul>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> <%=usua%></a></li>
-                            <li class="active"><a href="index.jsp"><span class="glyphicon glyphicon-log-out"></span></a></li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
+            
+            <%@include file="jspf/MenuPrincipal.jspf" %>
         </div>
         <div class="container">
             <div class="panel panel-primary">
@@ -102,13 +74,7 @@
                 </div>
             </div>
         </div>
-        <br><br><br>
-        <div class="navbar navbar-fixed-bottom navbar-inverse">
-            <div class="text-center text-muted">
-                GNK Logística || Desarrollo de Aplicaciones 2009 - 2014 <span class="glyphicon glyphicon-registration-mark"></span><br />
-                Todos los Derechos Reservados
-            </div>
-        </div>
+        <%@include file="jspf/piePagina.jspf" %>
     </body>
 </html>
 

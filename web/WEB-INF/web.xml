@@ -20,6 +20,10 @@
         <servlet-name>FileUploadServlet</servlet-name>
         <servlet-class>in.co.sneh.controller.FileUploadServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ModificarPedido</servlet-name>
+        <servlet-class>Pedidos.ModificarPedido</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Loguear</servlet-name>
         <url-pattern>/Loguear</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>FileUploadServlet</servlet-name>
         <url-pattern>/FileUploadServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ModificarPedido</servlet-name>
+        <url-pattern>/ModificarPedido</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -38,36 +38,8 @@
         <div class="container">
             <h1>SIALSS</h1>
             <h4>Módulo - Requerimiento de Distribuidor</h4>
-            <div class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                            <span clss="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="main_menu.jsp">Inicio</a>
-                    </div>
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Requerimientos<b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="main_menu.jsp"  onclick="">Captura de Requerimientos</a></li>
-                                    <li><a href="verRequerimientos.jsp"  onclick="">Ver Requerimientos</a></li>
-                                    <!--li><a href="#"  onclick="window.open('verDevolucionesEntrada.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Imprimir Devoluciones</a></li>
-                                    <li><a href="#"  onclick="window.open('devolucionesInsumo.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Devolver</a></li-->
-                                </ul>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> <%=usua%></a></li>
-                            <li class="active"><a href="index.jsp"><span class="glyphicon glyphicon-log-out"></span></a></li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
+
+            <%@include file="jspf/MenuPrincipal.jspf" %>
 
             <h3>Ver Requerimientos</h3>
 
@@ -76,13 +48,13 @@
                     <td>ID Pedido</td>
                     <td>Status</td>
                     <td>Fecha de Captura</td>
-                    <td width="100px"></td>
+                    <td width="180px"></td>
                 </tr>
-                <%
-                    try {
+                <%                    try {
                         con.conectar();
                         ResultSet rset = con.consulta("select F_IdPed, F_StsPed, DATE_FORMAT(F_FecCap,'%d/%m/%Y %H:%i:%s')as F_FecCap from tb_pedidos where F_ClaCli = '" + F_ClaCli + "' and F_StsPed!=500");
                         while (rset.next()) {
+                            int banLibISEM = 0;
                             String color = "warning";
                             String status = "Inconcluso";
                             if (rset.getString("F_StsPed").equals("1")) {
@@ -93,6 +65,39 @@
                                 status = "Capturado";
                                 color = "success";
                             }
+                            
+                            if (rset.getString("F_StsPed").equals("3")) {
+                                status = "En Revisión por ISEM";
+                                color = "info";
+                            }
+
+                            ResultSet rset2 = con.consulta("select F_ClaPro, F_Cant, F_Obs, F_Id from tb_detpedido where F_IdPed = '" + rset.getString("F_IdPed") + "' order by F_ClaPro+0");
+                            while (rset2.next()) {
+                                int cantMax = 0;
+                                int cantSolPrev = 0;
+                                int banCantExedida = 0, CantExe = 0;
+                                ResultSet rset3 = con.consulta("select F_Cant from tb_maxdist where F_ClaPro='" + rset2.getString("F_ClaPro") + "' and F_ClaCli = '" + F_ClaCli + "'");
+                                while (rset3.next()) {
+                                    cantMax = rset3.getInt("F_Cant");
+                                }
+
+                                rset3 = con.consulta("select SUM(F_Cant) as TotalSol from tb_detpedido d, tb_pedidos p where d.F_IdPed = p.F_IdPed and p.F_ClaCli = '" + F_ClaCli + "' and d.F_ClaPro = '" + rset2.getString("F_ClaPro") + "' ");
+                                while (rset3.next()) {
+                                    cantSolPrev = rset3.getInt("TotalSol");
+                                }
+
+                                if (rset2.getInt("F_Cant") > cantMax && rset2.getString("F_Obs").equals("")) {
+                                    banLibISEM = 1;
+                                }
+
+                                cantMax = cantMax - cantSolPrev;
+
+                                if (cantMax < 0) {
+                                    banCantExedida = 1;
+                                    CantExe = (cantMax * -1);
+                                    cantMax = 0;
+                                }
+                            }
                 %>
                 <tr class="<%=color%>">
                     <td><%=rset.getString("F_IdPed")%></td>
@@ -100,13 +105,22 @@
                     <td><%=rset.getString("F_FecCap")%></td>
                     <td>
                         <div class="row">
-                            <form action="verRequerimentoEsp.jsp" method="post" class="col-sm-6">
+                            <form action="verRequerimentoEsp.jsp" method="post" class="col-sm-4">
                                 <input value="<%=rset.getString("F_IdPed")%>" name="F_IdPed"  class="hidden" />
                                 <button class="btn btn-primary btn-sm" name="accion" value="EliminarInsumo"><span class="glyphicon glyphicon-search"></span></button>
                             </form>
-                            <form action="Capturar?F_IdPed=<%=rset.getString("F_IdPed")%>" method="post" class="col-sm-6">
-                                  <button class="btn btn-danger btn-sm" name="accion" onclick="return confirm('Seguro que desea eliminar el pedido?')" value="EliminarPedido">X</button>
+                            <form action="Capturar?F_IdPed=<%=rset.getString("F_IdPed")%>" method="post" class="col-sm-4">
+                                <button class="btn btn-danger btn-sm" name="accion" onclick="return confirm('Seguro que desea eliminar el pedido?')" value="EliminarPedido">X</button>
                             </form>
+                            <%
+                                if (banLibISEM == 0 && color.equals("success")) {
+                            %>
+                            <form action="Capturar?F_IdPed=<%=rset.getString("F_IdPed")%>" method="post" class="col-sm-4">
+                                <button class="btn btn-success btn-sm" name="accion" title="Liberar para ISEM" onclick="return confirm('Seguro que desea Confirmar el pedido?')" value="ValidaDist"><span class="glyphicon glyphicon-thumbs-up"></span></button>
+                            </form>
+                            <%
+                                }
+                            %>
                         </div>
                     </td>
                 </tr>
@@ -114,12 +128,13 @@
                         }
                         con.cierraConexion();
                     } catch (Exception e) {
-
+                        System.out.println(e.getMessage());
                     }
                 %>
                 </tr>
             </table>
         </div>
+        <%@include file="jspf/piePagina.jspf" %>
     </body>
     <!-- 
     ================================================== -->

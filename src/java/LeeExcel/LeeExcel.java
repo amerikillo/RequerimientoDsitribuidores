@@ -69,7 +69,7 @@ public class LeeExcel {
         try {
             con.conectar();
             con.ejecutar("insert into tb_pedidos values('" + claCli + "','0','0',CURDATE(),NOW())");
-            ResultSet rset = con.consulta("select MAX(F_IdPed) as F_IdPed from tb_pedidos where F_ClaCli = '" + claCli + "' and F_FecEnt = CURDATE ");
+            ResultSet rset = con.consulta("select MAX(F_IdPed) as F_IdPed from tb_pedidos where F_ClaCli = '" + claCli + "' and F_FecEnt = CURDATE() ");
             while (rset.next()) {
                 idPed = rset.getInt("F_IdPed");
             }
@@ -79,7 +79,7 @@ public class LeeExcel {
         }
         for (int i = 0; i < vectorData.size(); i++) {
             Vector vectorCellEachRowData = (Vector) vectorData.get(i);
-            String qry = "insert into tb_detpedido values (0, '"+idPed+"', ";
+            String qry = "insert into tb_detpedido values (0, '" + idPed + "', ";
             // looping every cell in each row
             for (int j = 0; j < 2; j++) {
 
@@ -117,18 +117,25 @@ public class LeeExcel {
                     }
                 }
             }
-            qry = qry + "curdate(), 0, '0')"; // agregar campos fuera del excel
+            qry = qry + " '', curdate(),'0')"; // agregar campos fuera del excel
             try {
                 con.conectar();
                 try {
                     System.out.println(qry);
-                    //con.ejecutar(qry);
+                    con.ejecutar(qry);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 con.cierraConexion();
             } catch (Exception e) {
             }
+        }
+
+        try {
+            con.conectar();
+            con.ejecutar("update tb_pedidos set F_StsPed= '2' where F_IdPed='"+idPed+"' ");
+            con.cierraConexion();
+        } catch (Exception e) {
         }
     }
 

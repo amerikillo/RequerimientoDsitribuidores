@@ -23,7 +23,7 @@
     ConectionDB con = new ConectionDB();
     String F_ClaPro = "", F_DesPro = "";
     int cantMax = 0;
-    int banCaptura = 0, banFinalizar = 0;
+    int banCaptura = 0, banFinalizar = 0, banCantExedida = 0, CantExe = 0;
     try {
         con.conectar();
         if (request.getParameter("accion").equals("BuscarInsumo")) {
@@ -37,12 +37,26 @@
             while (rset.next()) {
                 F_ClaPro = rset.getString("F_ClaPro");
                 F_DesPro = rset.getString("F_DesPro");
+                int cantSolPrev = 0;
                 ResultSet rset2 = con.consulta("select F_Cant from tb_maxdist where F_ClaPro = '" + rset.getString("F_ClaPro") + "' and F_ClaCli = '" + sesion.getAttribute("F_ClaCli") + "' ");
                 while (rset2.next()) {
                     cantMax = rset2.getInt("F_Cant");
                 }
+
+                rset2 = con.consulta("select SUM(F_Cant) as TotalSol from tb_detpedido d, tb_pedidos p where d.F_IdPed = p.F_IdPed and p.F_ClaCli = '" + sesion.getAttribute("F_ClaCli") + "' and d.F_ClaPro = '" + F_ClaPro + "'  and d.F_StsPed!=500");
+                while (rset2.next()) {
+                    cantSolPrev = rset2.getInt("TotalSol");
+                }
+
+                cantMax = cantMax - cantSolPrev;
                 banCaptura = 1;
+                if (cantMax < 0) {
+                    banCantExedida = 1;
+                    CantExe = (cantMax * -1);
+                    cantMax = 0;
+                }
             }
+
         }
         con.cierraConexion();
     } catch (Exception e) {
@@ -64,36 +78,8 @@
         <div class="container">
             <h1>SIALSS</h1>
             <h4>Módulo - Requerimiento de Distribuidor</h4>
-            <div class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                            <span clss="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="main_menu.jsp">Inicio</a>
-                    </div>
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Requerimientos<b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="main_menu.jsp"  onclick="">Captura de Requerimientos</a></li>
-                                    <li><a href="verRequerimientos.jsp"  onclick="">Ver Requerimientos</a></li>
-                                    <!--li><a href="#"  onclick="window.open('verDevolucionesEntrada.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Imprimir Devoluciones</a></li>
-                                    <li><a href="#"  onclick="window.open('devolucionesInsumo.jsp', '', 'width=1200,height=800,left=50,top=50,toolbar=no')">Devolver</a></li-->
-                                </ul>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> <%=usua%></a></li>
-                            <li class="active"><a href="index.jsp"><span class="glyphicon glyphicon-log-out"></span></a></li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
+            <%@include file="jspf/MenuPrincipal.jspf" %>
+
 
             <h3>Crear Requerimiento</h3>
 
@@ -102,7 +88,6 @@
                     <form action="Capturar">
                         <button class="btn btn-primary btn-block" type="submit" name="accion" value="NuevoRequerimento" 
                                 <%
-
                                     if (sesion.getAttribute(
                                             "F_IdPed") != null) {
                                         out.println("disabled");
@@ -149,6 +134,13 @@
                     <div class="col-sm-2">
                         <input class="form-control" placeholder="Máximo" value="<%=cantMax%>" id="CantMax" name="MaxCant" readonly />
                     </div>
+                    <%
+                        if (banCantExedida == 1) {
+                    %>
+                    <h5>Candidad Excedida con <%=CantExe%> piezas</h5>
+                    <%
+                        }
+                    %>
                 </div>
                 <div class="row">
                     <h4 class="col-sm-2">Observaciones</h4>
@@ -231,6 +223,7 @@
                 Todos los Derechos Reservados
             </div>
         </div>
+        <%@include file="jspf/piePagina.jspf" %>
     </body>
     <!-- 
     ================================================== -->

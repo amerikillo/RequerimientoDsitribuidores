@@ -15,16 +15,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Ingreso SAA</title>
+        <title>Ingreso Captura Requerimimentos</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Bootstrap -->
         <link href="css/bootstrap.css" rel="stylesheet" media="screen">
         <link href="css/login.css" rel="stylesheet" media="screen">
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-          <script src="../../assets/js/html5shiv.js"></script>
-          <script src="../../assets/js/respond.min.js"></script>
-        <![endif]-->
     </head>
     <body>
         <div class="container">
@@ -53,9 +49,9 @@
                                 con.conectar();
                                 ResultSet rset = con.consulta("select F_ClaCli, F_NomCli from tb_uniatn");
                                 while (rset.next()) {
-                                %>
-                                <option value="<%=rset.getString("F_ClaCli")%>"><%=rset.getString("F_NomCli")%></option>
-                                <%
+                        %>
+                        <option value="<%=rset.getString("F_ClaCli")%>"><%=rset.getString("F_NomCli")%></option>
+                        <%
                                 }
                                 con.cierraConexion();
                             } catch (Exception e) {
@@ -93,7 +89,7 @@
         </div>
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="//code.jquery.com/jquery.js"></script>
+        <script src="js/jquery.js"></script>
         <!-- Include all compiled plugins (below), or include individual files as needed -->
         <script src="js/bootstrap.js"></script>
     </body>

@@ -5,6 +5,7 @@
  */
 package Pedidos;
 
+import Correos.CorreoValidaDist;
 import conn.ConectionDB;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,9 +38,18 @@ public class Capturar extends HttpServlet {
         HttpSession sesion = request.getSession(true);
         ConectionDB con = new ConectionDB();
         try {
+            if (request.getParameter("accion").equals("ValidaDist")) {
+                CorreoValidaDist correo = new CorreoValidaDist();
+                con.conectar();
+                con.ejecutar("update tb_pedidos set F_StsPed=3 where  F_IdPed = '" + request.getParameter("F_IdPed") + "' ");
+                correo.enviaCorreo(request.getParameter("F_IdPed"));
+                con.cierraConexion();
+                response.sendRedirect("verRequerimientos.jsp");
+            }
             if (request.getParameter("accion").equals("EliminarPedido")) {
                 con.conectar();
                 con.ejecutar("update tb_pedidos set F_StsPed=500 where  F_IdPed = '" + request.getParameter("F_IdPed") + "' ");
+                con.ejecutar("update tb_detpedido set F_StsPed=500 where  F_IdPed = '" + request.getParameter("F_IdPed") + "' ");
                 con.cierraConexion();
                 response.sendRedirect("verRequerimientos.jsp");
             }

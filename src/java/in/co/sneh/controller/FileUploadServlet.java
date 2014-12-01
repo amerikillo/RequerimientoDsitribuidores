@@ -32,13 +32,13 @@ public class FileUploadServlet extends HttpServlet {
         ConectionDB con = new ConectionDB();
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        String Unidad = "";
+        HttpSession sesion = request.getSession(true);
+        String Unidad = (String) sesion.getAttribute("F_ClaCli");
 
         boolean isMultiPart = ServletFileUpload.isMultipartContent(request);
         if (isMultiPart) {
             ServletFileUpload upload = new ServletFileUpload();
             try {
-                HttpSession sesion = request.getSession(true);
                 FileItemIterator itr = upload.getItemIterator(request);
                 while (itr.hasNext()) {
                     FileItemStream item = itr.next();
@@ -53,9 +53,9 @@ public class FileUploadServlet extends HttpServlet {
                         String path = getServletContext().getRealPath("/");
                         if (FileUpload.processFile(path, item)) {
                             //response.getWriter().println("file uploaded successfully");
-                            if (lee.obtieneArchivo(path, item.getName())) {
-                                out.println("<script>alert('Se cargó el Folio Correctamente')</script>");
-                                out.println("<script>window.location='requerimiento.jsp'</script>");
+                            if (lee.obtieneArchivo(path, item.getName(), Unidad)) {
+                                out.println("<script>alert('Se cargó el Requerimiento Correctamente')</script>");
+                                out.println("<script>window.location='cargarRequerimiento.jsp'</script>");
                             }
                             //response.sendRedirect("cargaFotosCensos.jsp");
                         } else {
@@ -66,15 +66,15 @@ public class FileUploadServlet extends HttpServlet {
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
-                out.println("<script>alert('No se pudo cargar el Folio, " + e.getMessage() + "')</script>");
-                out.println("<script>window.location='requerimiento.jsp'</script>");
+                out.println("<script>alert('No se pudo cargar el Requerimiento, " + e.getMessage() + "')</script>");
+                out.println("<script>window.location='cargarRequerimiento.jsp'</script>");
             } catch (FileUploadException e) {
                 System.out.println(e.getMessage());
-                out.println("<script>alert('No se pudo cargar el Folio, " + e.getMessage() + "')</script>");
-                out.println("<script>window.location='requerimiento.jsp'</script>");
+                out.println("<script>alert('No se pudo cargar el Requerimiento, " + e.getMessage() + "')</script>");
+                out.println("<script>window.location='cargarRequerimiento.jsp'</script>");
             }
-            out.println("<script>alert('Se cargó el Folio Correctamente')</script>");
-            out.println("<script>window.location='requerimiento.jsp'</script>");
+            out.println("<script>alert('Se cargó el Requerimiento Correctamente')</script>");
+            out.println("<script>window.location='cargarRequerimiento.jsp'</script>");
             //response.sendRedirect("carga.jsp");
         }
 
